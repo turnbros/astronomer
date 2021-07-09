@@ -63,5 +63,6 @@ build: ## Build the Astronomer helm chart
 
 .PHONY: update-requirements
 update-requirements: ## Update all requirements.txt files
+	pip-compile --version || pip3 install --user "pip-tools>=6.2.0"
 	for FILE in requirements/*.in ; do pip-compile --quiet --allow-unsafe --upgrade --generate-hashes $${FILE} ; done ;
 	-pre-commit run requirements-txt-fixer --all-files --show-diff-on-failure

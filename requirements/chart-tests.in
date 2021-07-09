@@ -5,6 +5,7 @@ jmespath
 jsonschema
 kubernetes
 pytest
+pytest-check
 pytest-forked
 pytest-profiling
 pytest-sugar
