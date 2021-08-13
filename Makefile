@@ -65,3 +65,7 @@ build: ## Build the Astronomer helm chart
 update-requirements: ## Update all requirements.txt files
 	for FILE in requirements/*.in ; do pip-compile --quiet --allow-unsafe --upgrade --generate-hashes $${FILE} ; done ;
 	-pre-commit run requirements-txt-fixer --all-files --show-diff-on-failure
+
+.PHONY: docker-test
+docker-test:
+	docker build -t astronomer . && docker run --rm -ti astronomer
