@@ -30,6 +30,7 @@ unittest-requirements: .unittest-requirements ## Setup venv required for unit te
 
 .PHONY: unittest-charts
 unittest-charts: helm-unittest .unittest-requirements ## Unittest the Astronomer helm chart
+	python --version --version
 	venv/bin/python -m pytest -n auto tests
 
 helm-unittest: ## Run helm-unittest tests (deprecated test suite, but still valid tests)
