@@ -191,10 +191,6 @@ data:
                   extra_labels["kubernetes-pod-operator"] = "True"
                   extra_labels["kubernetes-executor"] = "False"
               pod.metadata.labels.update(extra_labels)
-
-              {{- if .Values.global.loggingSidecar.enabled }}
-              # add logging sidecar mutations
-              {{ end}}
             def pod_mutation_hook(pod):
               try:
                 pod_mutation_hook_new(pod)
@@ -288,7 +284,8 @@ data:
           sidecarEnv:
             {{- include "logging_sidecar_environment" . | indent 12 }}
           bulkConfig: {{ .Values.global.loggingSidecar.bulkConfig }}
-          entrypointScriptAddendum: {{ .Values.global.loggingSidecar.entrypointScriptAddendum }}
+          entrypointStartAddendum: {{ .Values.global.loggingSidecar.entrypointStartAddendum }}
+          entrypointStopAddendum: {{ .Values.global.loggingSidecar.entrypointStopAddendum }}
           resources:
             requests:
               cpu: "500m"
