@@ -167,6 +167,39 @@ s3:
   rootdirectory: {{ .Values.registry.s3.rootdirectory }}
 {{- end }}
 
+
+{{- /* common environment shared among all logging sidecar containers */ -}}
+{{- define "logging_sidecar_environment" }}
+- name: LOGGING_MODE
+  value: fluentd
+- name: OUTPUT_BUFFER_CHUNK_LIMIT
+  value: "2M"
+- name: OUTPUT_BUFFER_QUEUE_LIMIT
+  value: "8"
+- name: OUTPUT_HOST
+  value: {{ printf "%s-elasticsearch-nginx.%s" .Release.Name .Release.Namespace }}
+- name: OUTPUT_PORT
+  value: "9200"
+- name: RELEASE
+  value: {{ .Release.Name | quote}}
+{{- range $i, $config := .Values.global.loggingSidecar.extraSidecarEnv }}
+- name: {{ $config.name }}
+  value: {{ $config.value | quote }}
+{{- end }}
+{{- end }}
+
+{{- /* common environment shared among all containers logging to sidecars */ -}}
+{{- define "sidecar_logging_workload_environment" }}
+- name: SIDECAR_LOGGING_HOST
+  value: "127.0.0.1"
+- name: SIDECAR_LOGGING_PORT
+  value: "5170"
+{{- range $i, $config := .Values.global.loggingSidecar.extraWorkloadEnv }}
+- name: {{ $config.name }}
+  value: {{ $config.value | quote }}
+{{- end }}
+{{- end }}
+
 {{- define "houston_environment" }}
 {{- /* Dynamically created envs */ -}}
 {{- range $i, $config := .Values.houston.env }}

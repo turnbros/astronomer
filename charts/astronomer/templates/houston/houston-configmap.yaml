@@ -191,6 +191,10 @@ data:
                   extra_labels["kubernetes-pod-operator"] = "True"
                   extra_labels["kubernetes-executor"] = "False"
               pod.metadata.labels.update(extra_labels)
+
+              {{- if .Values.global.loggingSidecar.enabled }}
+              # add logging sidecar mutations
+              {{ end}}
             def pod_mutation_hook(pod):
               try:
                 pod_mutation_hook_new(pod)
@@ -270,6 +274,32 @@ data:
             {{ $key }}: {{ $value | quote }}
             {{- end }}
 
+    {{- end }}
+
+    {{- if .Values.global.loggingSidecar.enabled }}
+        # enables logging sidecar for airflow deployments
+        loggingSidecar:
+          enabled: true
+          repository: {{ .Values.global.loggingSidecar.repository }}
+          tag: {{ .Values.global.loggingSidecar.tag }}
+          pullPolicy: {{ .Values.global.loggingSidecar.pullPolicy }}
+          workloadEnv:
+            {{- include "sidecar_logging_workload_environment" . | indent 12 }}
+          sidecarEnv:
+            {{- include "logging_sidecar_environment" . | indent 12 }}
+          bulkConfig: {{ .Values.global.loggingSidecar.bulkConfig }}
+          entrypointScriptAddendum: {{ .Values.global.loggingSidecar.entrypointScriptAddendum }}
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1024Mi"
+            limits:
+              cpu: "1"
+              memory: "2048Mi"
+          annotations:
+            {{- range $key, $value := .Values.global.extraAnnotations}}
+            {{ $key }}: {{ $value | quote }}
+            {{- end }}
     {{- end }}
 
     # If we're in single namespace mode, we will also
