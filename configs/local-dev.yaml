@@ -18,6 +18,7 @@ tags:
 global:
   # Base domain for all subdomains exposed through ingress
   baseDomain: localtest.me
+  helmRepo: "https://internal-helm.astronomer.io"
 
   # Name of secret containing TLS certificate
   tlsSecret: astronomer-tls
@@ -62,18 +63,26 @@ astronomer:
         memory: "0Mi"
   houston:
     replicas: 1
+    env:
+    - name: DEPLOYMENTS__LOG_HELM_VALUES
+      value: "true"
     worker:
       replicas: 1
     resources:
       requests:
         cpu: "0m"
         memory: "0Mi"
-
     config:
       emailConfirmation: false
       auth:
         local:
           enabled: true
+      deployments:
+        helm:
+          defaultAirflowRepository: quay.io/astronomer/ap-airflow-dev
+          images:
+            airflow:
+              repository: quay.io/astronomer/ap-airflow-dev
   commander:
     replicas: 1
     resources:
