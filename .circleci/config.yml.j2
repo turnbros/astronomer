@@ -144,6 +144,8 @@ jobs:
             set -o pipefail
             helm template --kube-version=v{{ version }} -f values.yaml --set global.baseDomain=example.com . |
             kubent --cluster=false --helm2=false --helm3=false --filename -
+            helm template --kube-version=v{{ version }} -f values.yaml --set global.baseDomain=example.com --set global.istio.enabled=True . |
+            kubent --cluster=false --helm2=false --helm3=false --filename -
           when: always
 {%- endfor %}
 
