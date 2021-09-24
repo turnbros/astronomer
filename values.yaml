@@ -101,7 +101,7 @@ global:
       echo "HELLO WORLD"
     entrypointStopAddendum: |-
       echo "GOODBYE CRUEL WORLD"
-    loggingSidecarConfig:
+    loggingSidecarConfigMapContents:
       system.conf: |-
         <system>
           root_dir /tmp/fluentd-buffers/
@@ -121,9 +121,9 @@ global:
               format json
               time_format %Y-%m-%dT%H:%M:%S.%NZ
             </pattern>
-            # e.g. foo turns into { message: "foo"}
+            # e.g. v1 someUnixTimestamp somecomponent stderr cows are cool turns into { time: "someUnixTimestamp", component: "foo", "stream":"stderr", "message": "cows are cool"}
             <pattern>
-              format /^(?<log>.*)$/
+              format /^v1 (?<clienttm>[^ ]*) (?<stream>[^ ]*) (?<component>[^ ]*) (?<log>.*)$/
             </pattern>
           </parse>
           tag raw.unstructured.*
@@ -174,14 +174,14 @@ global:
             host ${hostname}
           </labels>
         </source>
-      output.conf: |
+      output.conf: |-
         # Drop unncessesary fields and rename some fields
         <filter unstructured.**>
           @type record_transformer
           enable_ruby
           renew_record
           <record>
-            component "#{ENV['COMPONENT']}"
+            component ${record["component"]}
             workspace "#{ENV['WORKSPACE']}"
             release "#{ENV['RELEASE']}"
             message ${record["log"]}

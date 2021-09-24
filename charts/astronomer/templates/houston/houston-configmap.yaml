@@ -279,11 +279,10 @@ data:
           repository: {{ .Values.global.loggingSidecar.repository }}
           tag: {{ .Values.global.loggingSidecar.tag }}
           pullPolicy: {{ .Values.global.loggingSidecar.pullPolicy }}
-          workloadEnv:
-            {{- include "sidecar_logging_workload_environment" . | indent 12 }}
-          sidecarEnv:
-            {{- include "logging_sidecar_environment" . | indent 12 }}
-          bulkConfig: {{ .Values.global.loggingSidecar.bulkConfig }}
+          workloadEnv: {{- include "sidecar_logging_workload_environment" . | indent 10 }}
+          sidecarEnv: {{- include "logging_sidecar_environment" . | indent 10 }}
+          loggingSidecarConfigMapContents:
+{{ .Values.global.loggingSidecar.loggingSidecarConfigMapContents | toYaml | indent 12 }}
           entrypointStartAddendum: {{ .Values.global.loggingSidecar.entrypointStartAddendum }}
           entrypointStopAddendum: {{ .Values.global.loggingSidecar.entrypointStopAddendum }}
           resources:

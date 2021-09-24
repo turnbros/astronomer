@@ -177,7 +177,7 @@ s3:
 - name: OUTPUT_BUFFER_QUEUE_LIMIT
   value: "8"
 - name: OUTPUT_HOST
-  value: {{ printf "%s-elasticsearch-nginx.%s" .Release.Name .Release.Namespace }}
+  value: {{ printf "%s-elasticsearch.%s" .Release.Name .Release.Namespace }}
 - name: OUTPUT_PORT
   value: "9200"
 - name: RELEASE
@@ -190,10 +190,12 @@ s3:
 
 {{- /* common environment shared among all containers logging to sidecars */ -}}
 {{- define "sidecar_logging_workload_environment" }}
-- name: SIDECAR_LOGGING_HOST
+- name: UNSTRUCTURED_LOGGING_HOST
   value: "127.0.0.1"
-- name: SIDECAR_LOGGING_PORT
+- name: UNSTRUCTURED_LOGGING_PORT
   value: "5170"
+- name: SIDECAR_LOGGING_KEEPALIVE_PORT
+  value: "9999"
 {{- range $i, $config := .Values.global.loggingSidecar.extraWorkloadEnv }}
 - name: {{ $config.name }}
   value: {{ $config.value | quote }}
