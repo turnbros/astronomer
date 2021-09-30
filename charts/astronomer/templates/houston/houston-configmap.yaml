@@ -286,12 +286,7 @@ data:
           entrypointStartAddendum: {{ .Values.global.loggingSidecar.entrypointStartAddendum }}
           entrypointStopAddendum: {{ .Values.global.loggingSidecar.entrypointStopAddendum }}
           resources:
-            requests:
-              cpu: "500m"
-              memory: "1024Mi"
-            limits:
-              cpu: "1"
-              memory: "2048Mi"
+{{ toYaml .Values.global.loggingSidecar.resources | indent 12 }}
           annotations:
             {{- range $key, $value := .Values.global.extraAnnotations}}
             {{ $key }}: {{ $value | quote }}

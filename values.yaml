@@ -91,12 +91,15 @@ global:
     repository: quay.io/astronomer/ap-logging-sidecar
     tag: 0.0.1 # TODO this is not a real tag
     pullPolicy: IfNotPresent
-    extraSidecarEnv:
-      - name: isAnAwesomeSidecar
-        value: definately
-    extraWorkloadEnv:
-      - name: isAnAwesomeLoggingSidecar
-        value: definately
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "250m"
+        memory: "256Mi"
+    extraSidecarEnv: []
+    extraWorkloadEnv: []
     entrypointStartAddendum: |-
       echo "HELLO WORLD"
     entrypointStopAddendum: |-
