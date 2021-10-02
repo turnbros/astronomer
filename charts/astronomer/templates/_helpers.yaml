@@ -83,6 +83,163 @@
   {{ $config | toJson | print }}
 {{- end }}
 
+{{ define "loggingSidecar.configMapContents" -}}
+{{- if .Values.global.loggingSidecar.enabled -}}
+system.conf: |-
+  <system>
+    root_dir /tmp/fluentd-buffers/
+  </system>
+unstructured.input.conf: |-
+  # Grab logs from hosts
+  <source>
+    @id unstructured-logging
+    @type tcp
+    tag tcp.events # required
+    bind 127.0.0.1
+    port 5170
+    <parse>
+      @type multi_format
+      # e.g. { log: "foo" } turns into { message: "foo" }
+      <pattern>
+	format json
+	time_format %Y-%m-%dT%H:%M:%S.%NZ
+      </pattern>
+      # e.g. v1 someUnixTimestamp somecomponent stderr cows are cool turns into { time: "someUnixTimestamp", component: "foo", "stream":"stderr", "message": "cows are cool"}
+      <pattern>
+	format /^v1 (?<clienttm>[^ ]*) (?<stream>[^ ]*) (?<component>[^ ]*) (?<log>.*)$/
+      </pattern>
+    </parse>
+    tag raw.unstructured.*
+  </source>
+  # Detect exceptions in the log output and forward them as one log entry.
+  <match raw.unstructured.**>
+    @id raw.unstructured
+    @type detect_exceptions
+    remove_tag_prefix raw
+    message log
+    stream stream
+    multiline_flush_interval 5
+    max_bytes 500000
+    max_lines 1000
+  </match>
+forward.input.conf: |-
+  # Takes the messages sent over TCP
+  <source>
+    @type forward
+  </source>
+monitoring.conf: |-
+  # Prometheus Exporter Plugin
+  # input plugin that exports metrics
+  <source>
+    @type prometheus
+  </source>
+  <source>
+    @type monitor_agent
+  </source>
+  # input plugin that collects metrics from MonitorAgent
+  <source>
+    @type prometheus_monitor
+    <labels>
+      host ${hostname}
+    </labels>
+  </source>
+  # input plugin that collects metrics for output plugin
+  <source>
+    @type prometheus_output_monitor
+    <labels>
+      host ${hostname}
+    </labels>
+  </source>
+  # input plugin that collects metrics for in_tail plugin
+  <source>
+    @type prometheus_tail_monitor
+    <labels>
+      host ${hostname}
+    </labels>
+  </source>
+output.conf: |-
+  # Drop unncessesary fields and rename some fields
+  <filter unstructured.**>
+    @type record_transformer
+    enable_ruby
+    renew_record
+    <record>
+      component ${record["component"]}
+      workspace "#{ENV['WORKSPACE']}"
+      release "#{ENV['RELEASE']}"
+      message ${record["log"]}
+    </record>
+  </filter>
+
+  # Attempt to parse any message fields that contain JSON
+  <filter unstructured.**>
+    @type parser
+    format json
+    key_name message
+    replace_invalid_sequence true
+    emit_invalid_record_to_error false
+    reserve_data true
+  </filter>
+
+  # If we have a dag_id, assume its a task log
+  <match unstructured.**>
+    @type rewrite_tag_filter
+    <rule>
+	  key dag_id
+            pattern .+
+            tag airflow.task
+          </rule>
+          <rule>
+            key component
+            pattern .+
+            tag airflow.system
+          </rule>
+        </match>
+
+        # Also add log_id to airflow.task logs
+        <filter airflow.task.**>
+          @type record_transformer
+          enable_ruby
+          <record>
+            log_id ${record["dag_id"]}_${record["task_id"]}_${record["execution_date"]}_${record["try_number"]}
+            offset ${time = Time.now; time.to_i * (10 ** 9) + time.nsec}
+          </record>
+        </filter>
+
+        # Send off to elasticsearch
+        <match airflow.**>
+          @type copy
+          <store>
+            @id elasticsearch
+            @type elasticsearch_dynamic
+            @log_level info
+            include_timestamp true
+            reconnect_on_error true
+            reload_on_failure true
+            reload_connections false
+            request_timeout 120s
+            suppress_type_name true
+            host "#{ENV['OUTPUT_HOST']}"
+            port "#{ENV['OUTPUT_PORT']}"
+            index_name fluentd.${record["release"]}.${Time.at(time).getutc.strftime(@logstash_dateformat)}
+            <buffer>
+              @type file
+              path "/tmp/buffer"
+              flush_mode interval
+              retry_type exponential_backoff
+              flush_thread_count 2
+              flush_interval 5s
+              retry_forever
+              retry_max_interval 30
+              chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+              queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
+              overflow_action block
+            </buffer>
+          </store>
+        </match>            
+{{- end }}
+{{- end }}
+
 {{ define "houston.backendSecret" -}}
 {{ default (printf "%s-houston-backend" .Release.Name) .Values.houston.backendSecretName }}
 {{- end }}

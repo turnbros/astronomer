@@ -282,7 +282,7 @@ data:
           workloadEnv: {{- include "sidecar_logging_workload_environment" . | indent 10 }}
           sidecarEnv: {{- include "logging_sidecar_environment" . | indent 10 }}
           loggingSidecarConfigMapContents:
-{{ .Values.global.loggingSidecar.loggingSidecarConfigMapContents | toYaml | indent 12 }}
+            {{ include "loggingSidecar.configMapContents" . | indent 12 | trim}}
           entrypointStartAddendum: {{ .Values.global.loggingSidecar.entrypointStartAddendum }}
           entrypointStopAddendum: {{ .Values.global.loggingSidecar.entrypointStopAddendum }}
           resources:
