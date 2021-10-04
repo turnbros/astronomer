@@ -100,10 +100,6 @@ global:
         memory: "256Mi"
     extraSidecarEnv: []
     extraWorkloadEnv: []
-    entrypointStartAddendum: |-
-      echo "HELLO WORLD"
-    entrypointStopAddendum: |-
-      echo "GOODBYE CRUEL WORLD"
 
   # Deploy auth sidecar to use openshift native features
   authSidecar:

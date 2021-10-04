@@ -283,8 +283,6 @@ data:
           sidecarEnv: {{- include "logging_sidecar_environment" . | indent 10 }}
           loggingSidecarConfigMapContents:
             {{ include "loggingSidecar.configMapContents" . | indent 12 | trim}}
-          entrypointStartAddendum: {{ .Values.global.loggingSidecar.entrypointStartAddendum }}
-          entrypointStopAddendum: {{ .Values.global.loggingSidecar.entrypointStopAddendum }}
           resources:
 {{ toYaml .Values.global.loggingSidecar.resources | indent 12 }}
           annotations:
