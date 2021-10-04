@@ -101,12 +101,12 @@ unstructured.input.conf: |-
       @type multi_format
       # e.g. { log: "foo" } turns into { message: "foo" }
       <pattern>
-	format json
-	time_format %Y-%m-%dT%H:%M:%S.%NZ
+        format json
+        time_format %Y-%m-%dT%H:%M:%S.%NZ
       </pattern>
       # e.g. v1 someUnixTimestamp somecomponent stderr cows are cool turns into { time: "someUnixTimestamp", component: "foo", "stream":"stderr", "message": "cows are cool"}
       <pattern>
-	format /^v1 (?<clienttm>[^ ]*) (?<stream>[^ ]*) (?<component>[^ ]*) (?<log>.*)$/
+        format /^v1 (?<clienttm>[^ ]*) (?<stream>[^ ]*) (?<component>[^ ]*) (?<log>.*)$/
       </pattern>
     </parse>
     tag raw.unstructured.*
@@ -185,7 +185,7 @@ output.conf: |-
   <match unstructured.**>
     @type rewrite_tag_filter
     <rule>
-	  key dag_id
+          key dag_id
             pattern .+
             tag airflow.task
           </rule>
