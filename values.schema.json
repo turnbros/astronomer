@@ -1,0 +1,87 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "properties": {
+        "astronomer": {
+            "properties": {
+                "houston": {
+                    "properties": {
+                        "config": {
+                            "properties": {
+                                "deployments": {
+                                    "properties": {
+                                        "helm": {
+                                            
+                                            "properties": {
+                                                "airflow": {
+                                                    "properties": {},
+                                                    "type": "object",
+                                                    "additionalProperties": true
+                                                },
+                                                "workers": {
+                                                    "properties": {
+                                                        "autoscaling": {
+                                                            "properties": {},
+                                                            "type": "object",
+                                                            "additionalProperties": true
+                                                        },
+                                                        "keda": {
+                                                            "properties": {},
+                                                            "type": "object",
+                                                            "additionalProperties": true
+                                                        },
+                                                        "persistence": {
+                                                            "properties": {},
+                                                            "type": "object",
+                                                            "additionalProperties": true
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "additionalProperties": false
+                                                },
+                                                "sccEnabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "extraObjects": {
+                                                    "type": "array"
+                                                },
+                                                "authSidecar": {
+                                                    "properties": {},
+                                                    "type": "object",
+                                                    "additionalProperties": true
+                                                },
+                                                "ingress": {
+                                                    "properties": {},
+                                                    "type": "object",
+                                                    "additionalProperties": true
+                                                },
+                                                "platform": {
+                                                    "properties": {},
+                                                    "type": "object",
+                                                    "additionalProperties": true
+                                                }
+                                            },
+                                            "type": "object",
+                                            "additionalProperties": false
+                                        }
+                                    },
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            },
+                            "type": "object",
+                            "additionalProperties": true
+                        } 
+                    },
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+    ],
+    "title": "Values",
+    "type": "object",
+    "additionalProperties": true
+}
