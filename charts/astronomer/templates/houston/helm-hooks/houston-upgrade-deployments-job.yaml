@@ -12,12 +12,12 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-  annotations:
+  annotations: []
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
-    "helm.sh/hook": post-upgrade,post-install
-    "helm.sh/hook-weight": "1"
-    "helm.sh/hook-delete-policy": before-hook-creation
+#    "helm.sh/hook": post-upgrade,post-install
+#    "helm.sh/hook-weight": "1"
+#    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   completions: 1
   parallelism: 1
